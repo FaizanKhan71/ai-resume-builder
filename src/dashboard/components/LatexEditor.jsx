@@ -157,7 +157,7 @@ GPA: X.X/4.0 (if above 3.5)
 
 function LatexEditor() {
   const [latexCode, setLatexCode] = useState(defaultLatexCode);
-  const apiUrl = process.env.NODE_ENV === 'production' ? '/api/compile-latex' : 'http://localhost:3001/compile-latex';
+  const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/compile-latex`;
   
   useEffect(() => {
     // Load MathJax for LaTeX math rendering
