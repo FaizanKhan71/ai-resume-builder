@@ -10,10 +10,12 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import EditResume from './dashboard/resume/[resumeId]/edit/index.jsx'
 import ViewResume from './my-resume/[resumeId]/view/index.jsx'
 import LatexEditor from './dashboard/components/LatexEditor.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!PUBLISHABLE_KEY) {
+  console.error('Missing Clerk Publishable Key. Available env vars:', import.meta.env)
   throw new Error('Missing Clerk Publishable Key')
 }
 
@@ -56,8 +58,10 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <RouterProvider router={router} />
-    </ClerkProvider>
+    <ErrorBoundary>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <RouterProvider router={router} />
+      </ClerkProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )
