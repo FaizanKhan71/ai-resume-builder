@@ -2,11 +2,20 @@ import axios from "axios";
 
 
 const API_KEY=import.meta.env.VITE_STRAPI_API_KEY;
+const BASE_URL=import.meta.env.VITE_API_BASE_URL;
+
+if (!API_KEY) {
+    console.warn('Missing Strapi API Key');
+}
+if (!BASE_URL) {
+    console.warn('Missing API Base URL');
+}
+
 const axiosClient=axios.create({
-    baseURL:import.meta.env.VITE_API_BASE_URL+"/api/",
+    baseURL: BASE_URL ? BASE_URL + "/api/" : "/api/",
     headers:{
         'Content-Type':'application/json',
-        'Authorization':`Bearer ${API_KEY}`
+        ...(API_KEY && {'Authorization':`Bearer ${API_KEY}`})
     }
 })
 

@@ -4,7 +4,7 @@ import { ResumeInfoContext } from '@/context/ResumeInfoContext'
 import ResumePreview from '@/dashboard/resume/components/ResumePreview'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import GlobalApi from './../../../../service/GlobalApi'
+import LocalStorageApi from './../../../../service/LocalStorageApi'
 import { RWebShare } from 'react-web-share'
 
 function ViewResume() {
@@ -16,9 +16,11 @@ function ViewResume() {
         GetResumeInfo();
     },[])
     const GetResumeInfo=()=>{
-        GlobalApi.GetResumeById(resumeId).then(resp=>{
-            console.log(resp.data.data);
-            setResumeInfo(resp.data.data);
+        LocalStorageApi.GetResumeById(resumeId).then(resp=>{
+            setResumeInfo(resp.data.data || {});
+        }).catch(error=>{
+            console.error('Error fetching resume:', error);
+            setResumeInfo({});
         })
     }
 

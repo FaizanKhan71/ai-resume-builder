@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import GlobalApi from './../../../service/GlobalApi'
+import LocalStorageApi from './../../../service/LocalStorageApi'
 import { toast } from 'sonner'
 
 function ResumeCardItem({resume,refreshData}) {
@@ -35,14 +35,15 @@ function ResumeCardItem({resume,refreshData}) {
 
   const onDelete=()=>{
     setLoading(true);
-    GlobalApi.DeleteResumeById(resume.documentId).then(resp=>{
-      console.log(resp);
+    LocalStorageApi.DeleteResumeById(resume.documentId).then(resp=>{
       toast('Resume Deleted!');
       refreshData()
       setLoading(false);
       setOpenAlert(false);
-    },(error)=>{
+    }).catch((error)=>{
+      console.error('Error deleting resume:', error);
       setLoading(false);
+      toast.error('Failed to delete resume')
     })
   }
   return (

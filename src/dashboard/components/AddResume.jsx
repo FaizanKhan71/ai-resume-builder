@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { v4 as uuidv4 } from 'uuid';
-import GlobalApi from './../../../service/GlobalApi'
+import LocalStorageApi from './../../../service/LocalStorageApi'
 import { useUser } from '@clerk/clerk-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
@@ -36,7 +36,7 @@ function AddResume() {
             }
         }
 
-        GlobalApi.CreateNewResume(data).then(resp=>{
+        LocalStorageApi.CreateNewResume(data).then(resp=>{
             console.log(resp.data.data.documentId);
             if(resp)
             {
@@ -49,7 +49,7 @@ function AddResume() {
 
     }
   return (
-    <div >
+    <div>
         <div className='p-14 py-24 border 
         items-center flex 
         justify-center bg-secondary
@@ -86,7 +86,6 @@ function AddResume() {
             </DialogHeader>
         </DialogContent>
         </Dialog>
-
     </div>
   )
 }

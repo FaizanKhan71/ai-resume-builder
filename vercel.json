@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "server/latex-compiler.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/server/latex-compiler.js"
+    }
+  ]
+}

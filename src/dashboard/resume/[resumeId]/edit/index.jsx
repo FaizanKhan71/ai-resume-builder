@@ -4,7 +4,7 @@ import FormSection from '../../components/FormSection';
 import ResumePreview from '../../components/ResumePreview';
 import { ResumeInfoContext } from '@/context/ResumeInfoContext';
 import dummy from '@/data/dummy';
-import GlobalApi from './../../../../../service/GlobalApi';
+import LocalStorageApi from './../../../../../service/LocalStorageApi';
 
 function EditResume() {
     const {resumeId}=useParams();
@@ -16,9 +16,11 @@ function EditResume() {
 
 
     const GetResumeInfo=()=>{
-        GlobalApi.GetResumeById(resumeId).then(resp=>{
-          console.log(resp.data.data);
-          setResumeInfo(resp.data.data);
+        LocalStorageApi.GetResumeById(resumeId).then(resp=>{
+          setResumeInfo(resp.data.data || {});
+        }).catch(error=>{
+          console.error('Error fetching resume:', error);
+          setResumeInfo({});
         })
     }
 

@@ -26,11 +26,19 @@ function FormSection() {
           <div className='flex gap-2'>
             {activeFormIndex>1
             &&<Button size="sm" 
-            onClick={()=>setActiveFormIndex(activeFormIndex-1)}> <ArrowLeft/> </Button> }
+            onClick={()=>{
+                if(activeFormIndex > 1) {
+                    setActiveFormIndex(activeFormIndex-1)
+                }
+            }}> <ArrowLeft/> </Button> }
             <Button 
-            disabled={!enableNext}
+            disabled={!enableNext || activeFormIndex >= 6}
             className="flex gap-2" size="sm"
-            onClick={()=>setActiveFormIndex(activeFormIndex+1)}
+            onClick={()=>{
+                if(activeFormIndex < 6) {
+                    setActiveFormIndex(activeFormIndex+1)
+                }
+            }}
             > Next 
             <ArrowRight/> </Button>
           </div>

@@ -4,7 +4,7 @@ import { ResumeInfoContext } from '@/context/ResumeInfoContext'
 import { LoaderCircle } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import GlobalApi from './../../../../../service/GlobalApi';
+import LocalStorageApi from './../../../../../service/LocalStorageApi';
 import { toast } from 'sonner';
 
 function PersonalDetail({enabledNext}) {
@@ -12,11 +12,14 @@ function PersonalDetail({enabledNext}) {
     const params=useParams();
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext)
 
-    const [formData,setFormData]=useState();
+    const [formData,setFormData]=useState({});
     const [loading,setLoading]=useState(false);
+    
     useEffect(()=>{
-        console.log("---",resumeInfo)
-    },[])
+        if (resumeInfo) {
+            setFormData(resumeInfo)
+        }
+    },[resumeInfo])
 
     const handleInputChange=(e)=>{
         enabledNext(false)
@@ -38,13 +41,14 @@ function PersonalDetail({enabledNext}) {
         const data={
             data:formData
         }
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(resp=>{
-            console.log(resp);
+        LocalStorageApi.UpdateResumeDetail(params?.resumeId,data).then(resp=>{
             enabledNext(true);
             setLoading(false);
             toast("Details updated")
-        },(error)=>{
+        }).catch((error)=>{
+            console.error('Error updating resume:', error);
             setLoading(false);
+            toast.error("Failed to update details")
         })
         
     }

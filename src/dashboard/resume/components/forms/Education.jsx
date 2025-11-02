@@ -5,7 +5,7 @@ import { ResumeInfoContext } from '@/context/ResumeInfoContext'
 import { LoaderCircle } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import GlobalApi from './../../../../../service/GlobalApi'
+import LocalStorageApi from './../../../../../service/LocalStorageApi'
 import { toast } from 'sonner'
 
 function Education() {
@@ -25,8 +25,10 @@ function Education() {
   ])
 
   useEffect(()=>{
-    resumeInfo&&setEducationalList(resumeInfo?.education)
-  },[])
+    if(resumeInfo?.education && resumeInfo.education.length > 0) {
+      setEducationalList(resumeInfo.education)
+    }
+  },[resumeInfo])
   const handleChange=(event,index)=>{
     const newEntries=educationalList.slice();
     const {name,value}=event.target;
@@ -58,13 +60,13 @@ function Education() {
       }
     }
 
-    GlobalApi.UpdateResumeDetail(params.resumeId,data).then(resp=>{
-      console.log(resp);
+    LocalStorageApi.UpdateResumeDetail(params.resumeId,data).then(resp=>{
       setLoading(false)
       toast('Details updated !')
-    },(error)=>{
+    }).catch((error)=>{
+      console.error('Error updating education:', error);
       setLoading(false);
-      toast('Server Error, Please try again!')
+      toast.error('Failed to update education')
     })
 
   }
@@ -82,7 +84,7 @@ function Education() {
 
     <div>
       {educationalList.map((item,index)=>(
-        <div>
+        <div key={index}>
           <div className='grid grid-cols-2 gap-3 border p-3 my-5 rounded-lg'>
             <div className='col-span-2'>
               <label>University Name</label>

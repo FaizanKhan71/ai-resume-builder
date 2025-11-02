@@ -11,20 +11,40 @@ function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext)
     const [loading,setLoading]=useState(false);
     const GenerateSummeryFromAI=async()=>{
-     
-      if(!resumeInfo?.Experience[index]?.title)
-      {
+      if(!resumeInfo?.Experience[index]?.title) {
         toast('Please Add Position Title');
-        return ;
+        return;
       }
-      setLoading(true)
-      const prompt=PROMPT.replace('{positionTitle}',resumeInfo.Experience[index].title);
       
-      const result=await AIChatSession.sendMessage(prompt);
-      console.log(result.response.text());
-      const resp=result.response.text()
-      setValue(resp.replace('[','').replace(']',''));
-      setLoading(false);
+      setLoading(true);
+      try {
+        const prompt=PROMPT.replace('{positionTitle}',resumeInfo.Experience[index].title);
+        console.log('Sending prompt:', prompt);
+        
+        const result = await AIChatSession.sendMessage(prompt);
+        const resp = result.response.text();
+        console.log('AI Response:', resp);
+        
+        setValue(resp.replace('[','').replace(']',''));
+        toast.success('AI content generated!');
+      } catch (error) {
+        console.error('AI Error:', error);
+        toast.error('AI generation failed. Using fallback.');
+        
+        // Fallback content
+        const jobTitle = resumeInfo.Experience[index].title;
+        const fallbackContent = `
+        <ul>
+          <li>Successfully managed and executed ${jobTitle} responsibilities</li>
+          <li>Collaborated with cross-functional teams to achieve project goals</li>
+          <li>Implemented best practices and improved workflow efficiency</li>
+          <li>Delivered high-quality results within specified deadlines</li>
+          <li>Contributed to team success through effective communication and problem-solving</li>
+        </ul>`;
+        setValue(fallbackContent);
+      } finally {
+        setLoading(false);
+      }
     }
   
     return (

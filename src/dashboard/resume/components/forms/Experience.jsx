@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import RichTextEditor from '../RichTextEditor'
 import { ResumeInfoContext } from '@/context/ResumeInfoContext'
 import { useParams } from 'react-router-dom'
-import GlobalApi from './../../../../../service/GlobalApi'
+import LocalStorageApi from './../../../../../service/LocalStorageApi'
 import { toast } from 'sonner'
 import { LoaderCircle } from 'lucide-react'
 
@@ -25,9 +25,10 @@ function Experience() {
     const [loading,setLoading]=useState(false);
 
     useEffect(()=>{
-        resumeInfo?.Experience.length>0&&setExperinceList(resumeInfo?.Experience)
-        
-    },[])
+        if(resumeInfo?.Experience && resumeInfo.Experience.length > 0) {
+            setExperinceList(resumeInfo.Experience)
+        }
+    },[resumeInfo])
 
     const handleChange=(index,event)=>{
         const newEntries=experinceList.slice();
@@ -80,12 +81,13 @@ function Experience() {
 
          console.log(experinceList)
 
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(res=>{
-            console.log(res);
+        LocalStorageApi.UpdateResumeDetail(params?.resumeId,data).then(res=>{
             setLoading(false);
             toast('Details updated !')
-        },(error)=>{
+        }).catch((error)=>{
+            console.error('Error updating experience:', error);
             setLoading(false);
+            toast.error('Failed to update experience')
         })
 
     }

@@ -6,7 +6,7 @@ import '@smastrom/react-rating/style.css'
 import { Button } from '@/components/ui/button'
 import { LoaderCircle } from 'lucide-react'
 import { ResumeInfoContext } from '@/context/ResumeInfoContext'
-import GlobalApi from './../../../../../service/GlobalApi'
+import LocalStorageApi from './../../../../../service/LocalStorageApi'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 function Skills() {
@@ -21,8 +21,10 @@ function Skills() {
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext);
    
     useEffect(()=>{
-        resumeInfo&&setSkillsList(resumeInfo?.skills)
-      },[])
+        if(resumeInfo?.skills && resumeInfo.skills.length > 0) {
+            setSkillsList(resumeInfo.skills)
+        }
+    },[resumeInfo])
    
     const handleChange=(index,name,value)=>{
         const newEntries=skillsList.slice();
@@ -50,14 +52,14 @@ function Skills() {
             }
         }
 
-        GlobalApi.UpdateResumeDetail(resumeId,data)
+        LocalStorageApi.UpdateResumeDetail(resumeId,data)
         .then(resp=>{
-            console.log(resp);
             setLoading(false);
             toast('Details updated !')
-        },(error)=>{
+        }).catch((error)=>{
+            console.error('Error updating skills:', error);
             setLoading(false);
-            toast('Server Error, Try again!')
+            toast.error('Failed to update skills')
         })
     }
 
@@ -74,7 +76,7 @@ function Skills() {
 
     <div>
         {skillsList.map((item,index)=>(
-            <div className='flex justify-between mb-2 border rounded-lg p-3 '>
+            <div key={index} className='flex justify-between mb-2 border rounded-lg p-3 '>
                 <div>
                     <label className='text-xs'>Name</label>
                     <Input className="w-full"
