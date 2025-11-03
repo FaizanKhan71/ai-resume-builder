@@ -58,10 +58,16 @@ function Experience() {
     }
 
     const handleRichTextEditor=(e,name,index)=>{
+        console.log('handleRichTextEditor called:', { name, index, value: e.target.value });
         const newEntries=experinceList.slice();
         newEntries[index][name]=e.target.value;
-       
         setExperinceList(newEntries);
+        
+        // Also update the resume info context immediately
+        setResumeInfo({
+            ...resumeInfo,
+            Experience: newEntries
+        });
     }
 
     useEffect(()=>{

@@ -3,6 +3,7 @@ import AddResume from './components/AddResume'
 import { useUser } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import LocalStorageApi from './../../service/LocalStorageApi';
+import { toast } from 'sonner';
 import ResumeCardItem from './components/ResumeCardItem';
 import { Code2, FileText, Eye, Plus, Menu, Sparkles, Download, Zap, MoreVertical, Edit, Share2, Trash2 } from 'lucide-react';
 import {
@@ -39,6 +40,18 @@ function Dashboard() {
       setResumeList([]);
     })
   }
+  
+  const handleDeleteResume = (documentId) => {
+    LocalStorageApi.DeleteResumeById(documentId)
+    .then(resp => {
+      toast.success('Resume deleted successfully!');
+      GetResumesList(); // Refresh the list
+    })
+    .catch(error => {
+      console.error('Error deleting resume:', error);
+      toast.error('Failed to delete resume');
+    });
+  }
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
       {/* Enhanced Header */}
@@ -51,17 +64,13 @@ function Dashboard() {
               </h1>
               <p className='text-gray-600 mt-2'>Choose your preferred method to create your professional resume</p>
             </div>
-            <div className='flex items-center gap-3'>
-              <div className='bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium'>
-                ✨ AI Powered
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
       
       <div className='p-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto'>
           {/* LaTeX Code Editor Card */}
           <div className='bg-white rounded-2xl shadow-lg border border-purple-100 overflow-hidden hover:shadow-xl transition-all duration-300'>
             <div className='bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-white'>
@@ -84,13 +93,17 @@ function Dashboard() {
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => navigate('/dashboard/latex-editor')}>
                       <Edit className='h-4 w-4 mr-2' />
-                      Open Editor
+                      Open LaTeX Editor
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard/latex-editor')}>
                       <FileText className='h-4 w-4 mr-2' />
-                      View Templates
+                      Browse Templates
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => window.open('https://www.overleaf.com/learn/latex', '_blank')}>
+                      <Sparkles className='h-4 w-4 mr-2' />
+                      LaTeX Documentation
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard/latex-editor')}>
                       <Download className='h-4 w-4 mr-2' />
                       Export Options
                     </DropdownMenuItem>
@@ -145,17 +158,17 @@ function Dashboard() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => document.querySelector('[data-create-resume]')?.click()}>
                       <Plus className='h-4 w-4 mr-2' />
                       Create New Resume
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                       <Eye className='h-4 w-4 mr-2' />
-                      View All Resumes
+                      View All Resumes ({resumeList.length})
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard/resume/new/edit')}>
                       <Sparkles className='h-4 w-4 mr-2' />
-                      AI Templates
+                      AI Resume Builder
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -164,7 +177,7 @@ function Dashboard() {
             
             <div className='p-4'>
               {/* Create New Resume Button */}
-              <div className='mb-4'>
+              <div className='mb-4' data-create-resume>
                 <AddResume/>
               </div>
               
@@ -208,16 +221,29 @@ function Dashboard() {
                         </div>
                         <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
                           <button 
-                            onClick={() => navigate(`/dashboard/resume/${resume.resumeId}/edit`)}
+                            onClick={() => navigate(`/dashboard/resume/${resume.documentId}/edit`)}
                             className='p-1 hover:bg-blue-100 rounded text-blue-600'
+                            title='Edit Resume'
                           >
                             <Edit className='h-3 w-3' />
                           </button>
                           <button 
-                            onClick={() => navigate(`/my-resume/${resume.resumeId}/view`)}
+                            onClick={() => navigate(`/my-resume/${resume.documentId}/view`)}
                             className='p-1 hover:bg-green-100 rounded text-green-600'
+                            title='View Resume'
                           >
                             <Eye className='h-3 w-3' />
+                          </button>
+                          <button 
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete "${resume.title}"?`)) {
+                                handleDeleteResume(resume.documentId);
+                              }
+                            }}
+                            className='p-1 hover:bg-red-100 rounded text-red-600'
+                            title='Delete Resume'
+                          >
+                            <Trash2 className='h-3 w-3' />
                           </button>
                         </div>
                       </div>
@@ -254,93 +280,85 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Generated Resume Preview Card */}
-          <div className='bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden hover:shadow-xl transition-all duration-300'>
-            <div className='bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-3'>
-                  <div className='bg-white/20 p-3 rounded-xl'>
-                    <Eye className='h-8 w-8' />
-                  </div>
-                  <div>
-                    <h3 className='text-xl font-bold'>Generated Resume</h3>
-                    <p className='text-green-100 text-sm'>Live preview</p>
-                  </div>
+
+        </div>
+        
+        {/* All Resumes Section */}
+        {resumeList.length > 0 && (
+          <div className='mt-12 max-w-7xl mx-auto'>
+            <div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
+              <div className='bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b'>
+                <h3 className='text-xl font-bold text-gray-800 flex items-center gap-2'>
+                  <FileText className='h-6 w-6' />
+                  All Your Resumes ({resumeList.length})
+                </h3>
+              </div>
+              
+              <div className='p-6'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                  {resumeList.map((resume, index) => (
+                    <div key={index} className='bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition-all duration-300 group border border-gray-200 hover:border-blue-300 hover:shadow-md'>
+                      <div className='flex items-start justify-between mb-3'>
+                        <div className='flex-1 min-w-0'>
+                          <h4 className='font-semibold text-gray-800 truncate mb-1'>
+                            {resume?.title || 'Untitled Resume'}
+                          </h4>
+                          <p className='text-sm text-gray-500 truncate'>
+                            {resume?.jobTitle || 'No job title specified'}
+                          </p>
+                          <p className='text-xs text-gray-400 mt-1'>
+                            Created: {new Date(resume?.createdAt || Date.now()).toLocaleDateString()}
+                          </p>
+                        </div>
+                        
+                        <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
+                          <button 
+                            onClick={() => navigate(`/dashboard/resume/${resume.documentId}/edit`)}
+                            className='p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors'
+                            title='Edit Resume'
+                          >
+                            <Edit className='h-4 w-4' />
+                          </button>
+                          <button 
+                            onClick={() => navigate(`/my-resume/${resume.documentId}/view`)}
+                            className='p-2 hover:bg-green-100 rounded-lg text-green-600 transition-colors'
+                            title='View Resume'
+                          >
+                            <Eye className='h-4 w-4' />
+                          </button>
+                          <button 
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete "${resume.title}"? This action cannot be undone.`)) {
+                                handleDeleteResume(resume.documentId);
+                              }
+                            }}
+                            className='p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors'
+                            title='Delete Resume'
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className='flex items-center justify-between pt-3 border-t border-gray-200'>
+                        <div className='flex items-center gap-2'>
+                          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
+                          <span className='text-xs text-gray-500'>Ready</span>
+                        </div>
+                        <button 
+                          onClick={() => navigate(`/my-resume/${resume.documentId}/view`)}
+                          className='text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition-colors'
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className='p-2 hover:bg-white/20 rounded-lg transition-colors'>
-                      <MoreVertical className='h-5 w-5 text-green-200' />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem>
-                      <Eye className='h-4 w-4 mr-2' />
-                      Preview Resume
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Download className='h-4 w-4 mr-2' />
-                      Download PDF
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Share2 className='h-4 w-4 mr-2' />
-                      Share Resume
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash2 className='h-4 w-4 mr-2' />
-                      Delete Resume
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
-            
-            <div className='p-6'>
-              {resumeList.length > 0 ? (
-                <div className='space-y-4'>
-                  <div className='bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-300'>
-                    <div className='text-center'>
-                      <Eye className='h-12 w-12 text-gray-400 mx-auto mb-2' />
-                      <h4 className='font-semibold text-gray-700'>Latest Resume</h4>
-                      <p className='text-sm text-gray-500 mb-3'>{resumeList[0]?.title || 'Untitled Resume'}</p>
-                      <button 
-                        onClick={() => navigate(`/my-resume/${resumeList[0]?.resumeId}/view`)}
-                        className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors'
-                      >
-                        View Resume
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className='grid grid-cols-2 gap-2'>
-                    <button className='bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2'>
-                      <Download className='h-4 w-4' />
-                      Download
-                    </button>
-                    <button className='bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2'>
-                      <Share2 className='h-4 w-4' />
-                      Share
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className='text-center py-8'>
-                  <div className='bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center'>
-                    <FileText className='h-8 w-8 text-gray-400' />
-                  </div>
-                  <h4 className='font-semibold text-gray-700 mb-2'>No Resume Yet</h4>
-                  <p className='text-sm text-gray-500 mb-4'>Create your first resume to see the preview here</p>
-                  <button 
-                    onClick={() => navigate('/dashboard/resume/new/edit')}
-                    className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors'
-                  >
-                    Create Resume
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
-        </div>
+        )}
         
         {/* Quick Stats */}
         <div className='mt-8 max-w-7xl mx-auto'>

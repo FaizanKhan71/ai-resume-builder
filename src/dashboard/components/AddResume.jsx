@@ -127,7 +127,7 @@ function AddResume() {
                     <div className='space-y-2'>
                         <p className='text-xs text-gray-500'>Quick suggestions:</p>
                         <div className='flex flex-wrap gap-2'>
-                            {['Software Developer', 'Product Manager', 'Data Scientist', 'UI/UX Designer'].map((suggestion) => (
+                            {['Software Developer', 'Product Manager', 'Data Scientist', 'UI/UX Designer', 'Power BI Developer'].map((suggestion) => (
                                 <button
                                     key={suggestion}
                                     onClick={() => setResumeTitle(suggestion + ' Resume')}

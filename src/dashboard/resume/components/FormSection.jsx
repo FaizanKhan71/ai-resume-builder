@@ -6,7 +6,7 @@ import Summery from './forms/Summery';
 import Experience from './forms/Experience';
 import Education from './forms/Education';
 import Skills from './forms/Skills';
-import Templates from './forms/Templates';
+
 import Photo from './forms/Photo';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import ThemeColor from './ThemeColor';
@@ -34,10 +34,10 @@ function FormSection() {
                 }
             }}> <ArrowLeft/> </Button> }
             <Button 
-            disabled={!enableNext || activeFormIndex >= 8}
+            disabled={!enableNext || activeFormIndex >= 7}
             className="flex gap-2" size="sm"
             onClick={()=>{
-                if(activeFormIndex < 8) {
+                if(activeFormIndex < 7) {
                     setActiveFormIndex(activeFormIndex+1)
                 }
             }}
@@ -49,18 +49,16 @@ function FormSection() {
         {activeFormIndex==1?  
         <PersonalDetail enabledNext={(v)=>setEnableNext(v)} />
         :activeFormIndex==2?
-        <Templates enabledNext={(v)=>setEnableNext(v)} />
-        :activeFormIndex==3?
         <Photo enabledNext={(v)=>setEnableNext(v)} />
-        :activeFormIndex==4?
+        :activeFormIndex==3?
               <Summery  enabledNext={(v)=>setEnableNext(v)} />
-        :activeFormIndex==5?
+        :activeFormIndex==4?
           <Experience />  
-          :activeFormIndex==6?
+          :activeFormIndex==5?
           <Education/>
-          :activeFormIndex==7?
+          :activeFormIndex==6?
           <Skills/>
-          :activeFormIndex==8?
+          :activeFormIndex==7?
           <Navigate to={'/my-resume/'+resumeId+"/view"}/>
               
         :null

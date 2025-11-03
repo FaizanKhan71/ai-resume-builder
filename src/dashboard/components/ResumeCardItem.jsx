@@ -1,4 +1,4 @@
-import { Loader2Icon, MoreVertical, Notebook } from 'lucide-react'
+import { Loader2Icon, MoreVertical, Notebook, Edit, Eye, Download, Trash2, Share2 } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -76,13 +76,41 @@ function ResumeCardItem({resume,refreshData}) {
           <DropdownMenuTrigger>
           <MoreVertical className='h-4 w-4 cursor-pointer'/>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-           
-            <DropdownMenuItem  onClick={()=>navigation('/dashboard/resume/'+resume.documentId+"/edit")}>Edit</DropdownMenuItem>
-            <DropdownMenuItem onClick={()=>navigation('/my-resume/'+resume.documentId+"/view")}>View</DropdownMenuItem>
-            <DropdownMenuItem onClick={()=>navigation('/my-resume/'+resume.documentId+"/view")}>Download</DropdownMenuItem>
-            <DropdownMenuItem onClick={()=>setOpenAlert(true)}>Delete</DropdownMenuItem>
-            
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={()=>navigation('/dashboard/resume/'+resume.documentId+"/edit")}>
+              <Edit className='h-4 w-4 mr-2' />
+              Edit Resume
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>navigation('/my-resume/'+resume.documentId+"/view")}>
+              <Eye className='h-4 w-4 mr-2' />
+              View Resume
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>{
+              navigation('/my-resume/'+resume.documentId+"/view");
+              setTimeout(() => window.print(), 1000);
+            }}>
+              <Download className='h-4 w-4 mr-2' />
+              Download PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>{
+              const shareUrl = `${window.location.origin}/my-resume/${resume.documentId}/view`;
+              if (navigator.share) {
+                navigator.share({
+                  title: resume.title,
+                  url: shareUrl
+                });
+              } else {
+                navigator.clipboard.writeText(shareUrl);
+                toast('Resume link copied to clipboard!');
+              }
+            }}>
+              <Share2 className='h-4 w-4 mr-2' />
+              Share Resume
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>setOpenAlert(true)} className="text-red-600">
+              <Trash2 className='h-4 w-4 mr-2' />
+              Delete Resume
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -92,8 +120,8 @@ function ResumeCardItem({resume,refreshData}) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your account
-              and remove your data from our servers.
+              This action cannot be undone. This will permanently delete "{resume.title}" 
+              and remove it from your dashboard.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
