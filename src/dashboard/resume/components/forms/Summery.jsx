@@ -81,8 +81,7 @@ function Summery({enabledNext}) {
                 <Brain className='h-4 w-4' />  Generate from AI</Button>
             </div>
             <Textarea className="mt-5" required
-            value={summery}
-                defaultValue={summery?summery:resumeInfo?.summery}
+            value={summery || resumeInfo?.summery || ''}
             onChange={(e)=>setSummery(e.target.value)}
             />
             <div className='mt-2 flex justify-end'>

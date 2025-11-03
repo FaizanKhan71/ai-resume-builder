@@ -61,35 +61,35 @@ function PersonalDetail({enabledNext}) {
             <div className='grid grid-cols-2 mt-5 gap-3'>
                 <div>
                     <label className='text-sm'>First Name</label>
-                    <Input name="firstName" defaultValue={resumeInfo?.firstName} required onChange={handleInputChange}  />
+                    <Input name="firstName" value={formData?.firstName || ''} required onChange={handleInputChange}  />
                 </div>
                 <div>
                     <label className='text-sm'>Last Name</label>
                     <Input name="lastName" required onChange={handleInputChange} 
-                    defaultValue={resumeInfo?.lastName} />
+                    value={formData?.lastName || ''} />
                 </div>
                 <div className='col-span-2'>
                     <label className='text-sm'>Job Title</label>
                     <Input name="jobTitle" required 
-                    defaultValue={resumeInfo?.jobTitle}
+                    value={formData?.jobTitle || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div className='col-span-2'>
                     <label className='text-sm'>Address</label>
                     <Input name="address" required 
-                    defaultValue={resumeInfo?.address}
+                    value={formData?.address || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div>
                     <label className='text-sm'>Phone</label>
                     <Input name="phone" required 
-                    defaultValue={resumeInfo?.phone}
+                    value={formData?.phone || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div>
                     <label className='text-sm'>Email</label>
                     <Input name="email" required 
-                    defaultValue={resumeInfo?.email}
+                    value={formData?.email || ''}
                     onChange={handleInputChange}  />
                 </div>
             </div>
