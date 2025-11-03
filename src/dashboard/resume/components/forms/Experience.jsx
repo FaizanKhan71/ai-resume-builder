@@ -19,16 +19,18 @@ const formField={
 
 }
 function Experience() {
-    const [experinceList,setExperinceList]=useState([]);
+    const [experinceList,setExperinceList]=useState([formField]);
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext);
     const params=useParams();
     const [loading,setLoading]=useState(false);
+    const [initialized,setInitialized]=useState(false);
 
     useEffect(()=>{
-        if(resumeInfo?.Experience && resumeInfo.Experience.length > 0) {
+        if(resumeInfo?.Experience && resumeInfo.Experience.length > 0 && !initialized) {
             setExperinceList(resumeInfo.Experience)
+            setInitialized(true)
         }
-    },[resumeInfo])
+    },[resumeInfo?.Experience, initialized])
 
     const handleChange=(index,event)=>{
         const newEntries=experinceList.slice();
@@ -63,12 +65,13 @@ function Experience() {
     }
 
     useEffect(()=>{
-        setResumeInfo({
-            ...resumeInfo,
-            Experience:experinceList
-        });
-     
-    },[experinceList]);
+        if(initialized) {
+            setResumeInfo({
+                ...resumeInfo,
+                Experience:experinceList
+            });
+        }
+    },[experinceList, initialized]);
 
 
     const onSave=()=>{
@@ -144,7 +147,7 @@ function Experience() {
                            {/* Work Summery  */}
                            <RichTextEditor
                            index={index}
-                           defaultValue={item?.workSummery}
+                           defaultValue={item?.workSummery || ''}
                            onRichTextEditorChange={(event)=>handleRichTextEditor(event,'workSummery',index)}  />
                         </div>
                     </div>

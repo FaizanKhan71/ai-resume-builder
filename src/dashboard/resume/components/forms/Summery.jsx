@@ -74,15 +74,24 @@ const generateFallbackSummaries = (jobTitle) => {
 const prompt="Job Title: {jobTitle}. Generate detailed professional summaries for different experience levels."
 function Summery({enabledNext}) {
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext);
-    const [summery,setSummery]=useState();
+    const [summery,setSummery]=useState('');
     const [loading,setLoading]=useState(false);
     const params=useParams();
     const [aiGeneratedSummeryList,setAiGenerateSummeryList]=useState();
+    
     useEffect(()=>{
-        summery&&setResumeInfo({
-            ...resumeInfo,
-            summery:summery
-        })
+        if(resumeInfo?.summery) {
+            setSummery(resumeInfo.summery);
+        }
+    },[resumeInfo?.summery])
+    
+    useEffect(()=>{
+        if(summery) {
+            setResumeInfo({
+                ...resumeInfo,
+                summery:summery
+            })
+        }
     },[summery])
 
     const GenerateSummeryFromAI=async()=>{
@@ -151,8 +160,9 @@ function Summery({enabledNext}) {
                 <Brain className='h-4 w-4' />  Generate from AI</Button>
             </div>
             <Textarea className="mt-5" required
-            value={summery || resumeInfo?.summery || ''}
+            value={summery}
             onChange={(e)=>setSummery(e.target.value)}
+            placeholder="Enter your professional summary here..."
             />
             <div className='mt-2 flex justify-end'>
             <Button type="submit"

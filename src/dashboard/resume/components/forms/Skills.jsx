@@ -16,15 +16,16 @@ function Skills() {
         rating:0
     }])
     const {resumeId}=useParams();
-
+    const [initialized,setInitialized]=useState(false);
     const [loading,setLoading]=useState(false);
     const {resumeInfo,setResumeInfo}=useContext(ResumeInfoContext);
    
     useEffect(()=>{
-        if(resumeInfo?.skills && resumeInfo.skills.length > 0) {
+        if(resumeInfo?.skills && resumeInfo.skills.length > 0 && !initialized) {
             setSkillsList(resumeInfo.skills)
+            setInitialized(true)
         }
-    },[resumeInfo])
+    },[resumeInfo?.skills, initialized])
    
     const handleChange=(index,name,value)=>{
         const newEntries=skillsList.slice();
@@ -64,11 +65,13 @@ function Skills() {
     }
 
     useEffect(()=>{
-        setResumeInfo({
-            ...resumeInfo,
-            skills:skillsList
-        })
-    },[skillsList])
+        if(initialized) {
+            setResumeInfo({
+                ...resumeInfo,
+                skills:skillsList
+            })
+        }
+    },[skillsList, initialized])
   return (
     <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
     <h2 className='font-bold text-lg'>Skills</h2>
