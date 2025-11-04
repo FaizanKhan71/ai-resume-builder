@@ -1,3 +1,6 @@
+<img width="1347" height="635" alt="image" src="https://github.com/user-attachments/assets/66ec3199-5864-4e3a-8085-fdb60eccc158" />
+
+
 ### 📄 `README.md` for `ProFile Ai`
 
 ```markdown
